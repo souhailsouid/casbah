@@ -499,7 +499,11 @@ footer { border-top: 1px solid rgba(201,164,92,.18); padding: 80px 0 40px; overf
 .r-steps i { width: 22px; height: 2px; background: rgba(201,164,92,.22); transition: background .4s; }
 .r-steps i.on { background: var(--or); }
 .r-close { background: none; border: 0; color: var(--or); font-size: 30px; line-height: 1; cursor: pointer; font-family: Georgia, serif; padding: 0 0 4px 12px; }
-.r-body { flex-grow: 1; overflow-y: auto; padding: 32px 34px; display: flex; flex-direction: column; }
+.r-body { flex-grow: 1; overflow-y: auto; padding: 32px 34px; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: rgba(201,164,92,.35) transparent; }
+.r-body::-webkit-scrollbar { width: 6px; }
+.r-body::-webkit-scrollbar-track { background: transparent; }
+.r-body::-webkit-scrollbar-thumb { background: rgba(201,164,92,.35); border-radius: 3px; }
+.r-body::-webkit-scrollbar-thumb:hover { background: var(--or); }
 .rstep { display: none; flex-direction: column; gap: 20px; animation: rin .5s var(--ease); }
 .rstep.on { display: flex; }
 @keyframes rin { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
@@ -518,9 +522,10 @@ footer { border-top: 1px solid rgba(201,164,92,.18); padding: 80px 0 40px; overf
 .r-opt .n { font-family: "Cormorant Garamond", Georgia, serif; font-size: 21px; }
 .r-opt .d { font-size: 12.5px; opacity: .75; }
 .r-opt .p { font-family: "Cormorant Garamond", Georgia, serif; font-size: 21px; white-space: nowrap; }
-.r-days { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+/* Les 12 jours passent à la ligne (grille) au lieu d'un défilement horizontal avec barre grise. */
+.r-days { display: grid; grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 10px; }
 .r-day {
-  flex: 0 0 auto; width: 76px; padding: 12px 6px;
+  padding: 12px 6px;
   background: none; border: 1px solid rgba(201,164,92,.28); color: var(--creme);
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   cursor: pointer; transition: border-color .35s, background .35s, color .35s;
