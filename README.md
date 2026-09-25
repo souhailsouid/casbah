@@ -13,6 +13,11 @@ pnpm build                        # génère le site statique dans out/
 
 Le dossier `out/` se déploie tel quel (Vercel, Netlify, Caddy/Nginx…).
 
+### Déploiement automatique (GitHub Pages)
+
+Chaque push sur `main` déclenche `.github/workflows/deploy-pages.yml` et met à jour
+**https://souhailsouid.github.io/casbah/** (build avec `BASE_PATH=/casbah`). Aucune action manuelle.
+
 ### Publier en ligne (artifact Claude)
 
 Le site est publié en artifact : https://claude.ai/artifact/9UBFGJi3ohrTvMaaLCPQ82 (et l'ancien lien client https://claude.ai/artifact/F32nRqANrtLjx83EdBK62u pointe sur la même version).
