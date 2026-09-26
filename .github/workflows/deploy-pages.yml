@@ -1,10 +1,15 @@
-# Déploiement automatique sur GitHub Pages à chaque push sur main.
+# Déploiement automatique du site (apps/web) sur GitHub Pages à chaque push sur main.
 # Site servi sur https://souhailsouid.github.io/casbah/
-name: Déployer sur GitHub Pages
+name: Déployer le site (GitHub Pages)
 
 on:
   push:
     branches: [main]
+    paths:
+      - "apps/web/**"
+      - "packages/shared/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -29,15 +34,22 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @casbah/shared build
       - name: Build (export statique sous /casbah)
-        run: pnpm build
+        run: pnpm --filter @casbah/web build
         env:
           BASE_PATH: /casbah
+          # Variables de dépôt (Settings → Secrets and variables → Actions → Variables).
+          # Vides = site en mode démo, admin désactivé.
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
       - name: Désactiver Jekyll (dossier _next)
-        run: touch out/.nojekyll
+        run: touch apps/web/out/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: out
+          path: apps/web/out
 
   deploy:
     needs: build

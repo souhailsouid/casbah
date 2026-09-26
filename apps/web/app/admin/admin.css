@@ -1,0 +1,75 @@
+/* Interface marchand : même charte (or, sable, brun), densité tableau de bord. */
+.adm { min-height: 100svh; background: var(--noir); color: var(--creme); }
+.adm-nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 22px; padding: 14px clamp(16px, 3vw, 32px); background: rgba(19,13,7,.92); border-bottom: 1px solid rgba(201,164,92,.18); backdrop-filter: blur(10px); }
+.adm-nav .brand { display: flex; align-items: center; gap: 10px; }
+.adm-nav .brand b { font-family: "Marcellus", serif; font-weight: 400; font-size: 14px; letter-spacing: .26em; color: var(--sable); }
+.adm-nav .brand small { font-size: 9px; letter-spacing: .3em; color: var(--or); }
+.adm-nav .links { display: flex; gap: 6px; margin-inline-start: auto; }
+.adm-nav .links a { font-size: 12.5px; letter-spacing: .08em; color: var(--creme); padding: 8px 12px; border: 1px solid transparent; }
+.adm-nav .links a.on { border-color: rgba(201,164,92,.35); color: var(--sable); }
+.adm-nav .links a .n { display: inline-block; min-width: 18px; padding: 1px 6px; margin-inline-start: 6px; background: var(--or); color: var(--noir); font-size: 11px; font-weight: 600; text-align: center; }
+.adm-nav .who { font-size: 12px; color: var(--creme-2); }
+.adm-nav .who button { background: none; border: 0; color: var(--or); cursor: pointer; font-size: 12px; letter-spacing: .08em; margin-inline-start: 10px; }
+.adm-main { width: min(1200px, 100%); margin-inline: auto; padding: 28px clamp(16px, 3vw, 32px) 80px; display: flex; flex-direction: column; gap: 28px; }
+.adm h1 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; font-size: 34px; color: var(--sable); line-height: 1.1; }
+.adm h1 em { font-style: italic; color: var(--or); }
+.adm h2 { font-family: "Marcellus", serif; font-weight: 400; font-size: 12px; letter-spacing: .3em; color: var(--or); margin-bottom: 12px; }
+.adm .muted { color: var(--creme-2); font-size: 13px; }
+.adm .btn.sm { padding: 10px 16px; font-size: 11.5px; }
+.adm .btn.danger { background: transparent; color: var(--sable); border-color: rgba(176,86,63,.6); }
+.adm .btn.danger::before { background: var(--terre); }
+.adm .btn:disabled { opacity: .4; pointer-events: none; }
+
+/* login */
+.adm-login { min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.adm-login form { width: min(400px, 100%); border: 1px solid var(--or-dim); background: #1A1209; padding: 36px 34px; display: flex; flex-direction: column; gap: 18px; }
+
+/* listes */
+.adm-list { display: flex; flex-direction: column; gap: 10px; }
+.adm-row { display: grid; grid-template-columns: 92px 1fr auto; gap: 16px; align-items: center; border: 1px solid rgba(201,164,92,.22); background: linear-gradient(170deg, rgba(43,30,15,.5), rgba(19,13,7,0)); padding: 14px 16px; }
+.adm-row.pending { border-color: var(--or); }
+.adm-row .when { display: flex; flex-direction: column; line-height: 1.1; }
+.adm-row .when b { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; font-size: 28px; color: var(--sable); }
+.adm-row .when small { font-size: 10.5px; letter-spacing: .16em; color: var(--or); text-transform: uppercase; }
+.adm-row .who { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.adm-row .who b { font-size: 15px; color: var(--sable); font-weight: 500; }
+.adm-row .who span { font-size: 12.5px; color: var(--creme-2); }
+.adm-row .acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 640px) { .adm-row { grid-template-columns: 72px 1fr; } .adm-row .acts { grid-column: 1 / -1; justify-content: flex-start; } }
+.adm-empty { border: 1px dashed rgba(201,164,92,.3); padding: 26px; text-align: center; color: var(--creme-2); font-size: 13.5px; }
+
+/* badges */
+.badge { display: inline-block; font-size: 10.5px; letter-spacing: .14em; padding: 4px 9px; border: 1px solid; text-transform: uppercase; white-space: nowrap; }
+.badge.pending { color: var(--or-2); border-color: var(--or); }
+.badge.confirmed { color: #8fd3a5; border-color: rgba(143,211,165,.6); }
+.badge.declined, .badge.cancelled, .badge.no_show { color: #e2a08f; border-color: rgba(176,86,63,.7); }
+.badge.completed { color: var(--creme-2); border-color: rgba(241,232,212,.3); }
+.badge.sent, .badge.queued { color: var(--creme); border-color: rgba(241,232,212,.3); }
+.badge.delivered, .badge.read { color: #8fd3a5; border-color: rgba(143,211,165,.6); }
+.badge.failed { color: #e2a08f; border-color: rgba(176,86,63,.7); }
+
+/* détail */
+.adm-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 900px) { .adm-grid { grid-template-columns: 1.1fr .9fr; } }
+.adm-card { border: 1px solid rgba(201,164,92,.22); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+.adm-kv { display: grid; grid-template-columns: 140px 1fr; gap: 8px 14px; font-size: 14px; }
+.adm-kv span { color: var(--creme-2); }
+.adm-kv b { color: var(--sable); font-weight: 500; }
+.adm-log { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.adm-log .item { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(201,164,92,.14); }
+.adm-log .item small { color: var(--creme-2); display: block; margin-top: 2px; }
+.adm-log .err { color: #e2a08f; }
+
+/* formulaires */
+.adm-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px 22px; }
+.adm-form .r-field input, .adm-form .r-field select { background: none; border: 0; border-bottom: 1px solid rgba(201,164,92,.35); color: var(--sable); font-family: "Figtree", sans-serif; font-size: 15px; padding: 9px 2px; outline: none; }
+.adm-form .r-field input:focus { border-bottom-color: var(--or); }
+.adm-hours { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.adm-hours table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.adm-hours td { padding: 6px 4px; border-bottom: 1px solid rgba(201,164,92,.14); }
+.adm-hours td:first-child { color: var(--creme-2); width: 90px; }
+.adm-hours input[type="number"] { width: 64px; background: none; border: 1px solid rgba(201,164,92,.3); color: var(--sable); padding: 5px 6px; font-family: "Figtree", sans-serif; }
+.adm-hours input[type="checkbox"] { accent-color: var(--or); }
+.adm-toast { position: fixed; bottom: 22px; inset-inline-start: 50%; transform: translateX(-50%); background: var(--or); color: var(--noir); padding: 12px 20px; font-size: 13px; font-weight: 600; letter-spacing: .06em; z-index: 50; }
+.adm-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.adm-filters select, .adm-filters input { background: #1A1209; border: 1px solid rgba(201,164,92,.35); color: var(--sable); padding: 8px 10px; font-family: "Figtree", sans-serif; font-size: 13px; }

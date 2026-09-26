@@ -37,6 +37,18 @@ export type Bundle = {
   giftLbls: Record<number, string>;
   types: string[];
   repas: [string, string];
+  /** Réservation réelle (API) */
+  envoyer: string;
+  envoiEnCours: string;
+  optIn: string;
+  emailLabel: string;
+  depositNote: (dep: number) => string;
+  resaSent: (nom: string, j: string, dt: number, m: string, h: number, viaWhatsapp: boolean, viaEmail: boolean) => string;
+  errGeneric: string;
+  errFull: string;
+  errDuplicate: string;
+  errPhone: string;
+  slotFull: string;
 };
 
 const B: Record<Lang, Bundle> = {
@@ -69,6 +81,18 @@ const B: Record<Lang, Bundle> = {
     giftLbls: { 39: "Le Rituel Signature", 49: "L'Évasion Complète", 75: "Évasion + soins", 100: "Évasion pour deux" },
     types: ["EVJF", "Anniversaire", "Équipe & CSE", "Autre"],
     repas: ["Avec repas au restaurant", "Sans repas"],
+    envoyer: "ENVOYER LA DEMANDE",
+    envoiEnCours: "ENVOI…",
+    optIn: "Recevoir la confirmation sur WhatsApp à ce numéro",
+    emailLabel: "E-MAIL (FACULTATIF)",
+    depositNote: (dep) => `Acompte de ${dep} € réglé sur place, déduit de votre note.`,
+    resaSent: (nom, j, dt, m, h, wa, em) =>
+      `${nom} · ${j} ${dt} ${m} à ${h}h. Nous confirmons votre créneau sous 2 heures${wa ? " par WhatsApp" : em ? " par e-mail" : " par téléphone"}.`,
+    errGeneric: "Envoi impossible pour le moment. Réessayez ou appelez-nous.",
+    errFull: "Ce créneau vient de se remplir. Choisissez-en un autre.",
+    errDuplicate: "Une demande existe déjà pour ce numéro sur ce créneau.",
+    errPhone: "Numéro de téléphone illisible (ex. 06 12 34 56 78).",
+    slotFull: "COMPLET",
   },
   en: {
     jours: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -99,6 +123,18 @@ const B: Record<Lang, Bundle> = {
     giftLbls: { 39: "Le Rituel Signature", 49: "L'Évasion Complète", 75: "Escape + treatments", 100: "Escape for two" },
     types: ["Hen party", "Birthday", "Team & Corporate", "Other"],
     repas: ["With a meal at the restaurant", "Without meal"],
+    envoyer: "SEND REQUEST",
+    envoiEnCours: "SENDING…",
+    optIn: "Receive the confirmation on WhatsApp at this number",
+    emailLabel: "E-MAIL (OPTIONAL)",
+    depositNote: (dep) => `€${dep} deposit paid on site, deducted from your bill.`,
+    resaSent: (nom, j, dt, m, h, wa, em) =>
+      `${nom} · ${j} ${dt} ${m} at ${h}:00. We will confirm your slot within 2 hours${wa ? " on WhatsApp" : em ? " by e-mail" : " by phone"}.`,
+    errGeneric: "We could not send your request. Try again or call us.",
+    errFull: "This slot just filled up. Please pick another one.",
+    errDuplicate: "A request already exists for this number on this slot.",
+    errPhone: "Phone number not recognised (e.g. +33 6 12 34 56 78).",
+    slotFull: "FULL",
   },
   ar: {
     jours: ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
@@ -129,6 +165,18 @@ const B: Record<Lang, Bundle> = {
     giftLbls: { 39: "Le Rituel Signature", 49: "L'Évasion Complète", 75: "استرخاء + عنايات", 100: "استرخاء لشخصين" },
     types: ["حفلة عزوبية", "عيد ميلاد", "فريق عمل وشركات", "أخرى"],
     repas: ["مع وجبة في المطعم", "بدون وجبة"],
+    envoyer: "إرسال الطلب",
+    envoiEnCours: "جارٍ الإرسال…",
+    optIn: "استلام التأكيد عبر واتساب على هذا الرقم",
+    emailLabel: "البريد الإلكتروني (اختياري)",
+    depositNote: (dep) => `عربون ${dep} € يُدفع في المكان ويُخصم من فاتورتك.`,
+    resaSent: (nom, j, dt, m, h, wa, em) =>
+      `${nom} · ${j} ${dt} ${m} الساعة ${h}:00. سنؤكد موعدك خلال ساعتين${wa ? " عبر واتساب" : em ? " بالبريد الإلكتروني" : " هاتفيًا"}.`,
+    errGeneric: "تعذّر الإرسال حاليًا. حاول مجددًا أو اتصل بنا.",
+    errFull: "امتلأ هذا الموعد للتو. اختر موعدًا آخر.",
+    errDuplicate: "يوجد طلب سابق بهذا الرقم على هذا الموعد.",
+    errPhone: "رقم الهاتف غير مقروء (مثال: +33 6 12 34 56 78).",
+    slotFull: "ممتلئ",
   },
 };
 

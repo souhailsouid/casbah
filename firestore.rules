@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Le marchand (claim admin + restaurantId) peut LIRE son établissement en temps réel.
+    // TOUTES les écritures passent par l'API (firebase-admin ignore ces règles).
+    function isAdminOf(restaurantId) {
+      return request.auth != null
+          && request.auth.token.role == 'admin'
+          && request.auth.token.restaurantId == restaurantId;
+    }
+
+    match /restaurants/{restaurantId} {
+      allow read: if isAdminOf(restaurantId);
+      allow write: if false;
+
+      match /{sub=**} {
+        allow read: if isAdminOf(restaurantId);
+        allow write: if false;
+      }
+    }
+
+    match /profiles/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

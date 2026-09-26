@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
-  // Export statique : le site est une page unique, hébergeable n'importe où
-  // (Vercel, Netlify, un simple dossier `out/` derrière Caddy/Nginx, ou un artifact).
+  // Export statique : site + /admin (rendu côté client) hébergeables sur GitHub Pages ou n'importe quel CDN.
   output: "export",
   // Préfixe optionnel des assets (ex. ASSET_PREFIX=/nx pour l'hébergement en artifact,
   // qui interdit les chemins commençant par « _ »). Vide par défaut : /_next/... classique.
@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   trailingSlash: false,
   reactStrictMode: true,
-  // Le dossier vit dans le monorepo adel-ai mais reste un projet indépendant (pnpm --ignore-workspace).
-  outputFileTracingRoot: __dirname,
+  transpilePackages: ["@casbah/shared"],
+  outputFileTracingRoot: path.resolve(__dirname, "../.."),
 };
 
 export default nextConfig;

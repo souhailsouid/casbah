@@ -664,3 +664,17 @@ html[dir="rtl"] .foot-mark { font-family: "Amiri", serif; }
   #loader { display: none; }
   .marquee .rail { animation: none; }
 }
+
+/* ---------- réservation réelle : erreurs, opt-in, créneaux complets ---------- */
+.r-error { border: 1px solid var(--terre); color: var(--sable); background: rgba(176,86,63,.12); padding: 12px 14px; font-size: 13.5px; line-height: 1.5; }
+.r-check { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: var(--creme); cursor: pointer; line-height: 1.5; }
+.r-check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--or); flex-shrink: 0; }
+.r-slot.off, .r-slot:disabled { opacity: .35; cursor: not-allowed; }
+.r-days[aria-busy="true"] { opacity: .5; }
+
+/* ---------- pages simples (annulation) ---------- */
+.simple { min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+.simple .card { width: min(520px, 100%); border: 1px solid var(--or-dim); background: #1A1209; padding: 36px 34px; display: flex; flex-direction: column; gap: 18px; }
+.simple .card h1 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; font-size: 34px; line-height: 1.15; color: var(--sable); }
+.simple .card h1 em { font-style: italic; color: var(--or); }
+.simple .brand-line { font-family: "Marcellus", serif; font-size: 11px; letter-spacing: .34em; color: var(--or); }

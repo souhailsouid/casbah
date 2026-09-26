@@ -1,67 +1,66 @@
-# La Casbah — site vitrine
+# La Casbah — site, réservations et interface marchand
 
-Hammam · spa · restaurant oriental à Roissy-en-Brie. Site une page en **Next.js 15** (App Router, export statique), porté depuis la maquette HTML d'origine.
+Hammam · spa · restaurant oriental à Roissy-en-Brie. Monorepo pnpm :
+
+```
+apps/web          site vitrine Next.js 15 (export statique) + interface marchand /admin
+apps/api          API Fastify : réservations, notifications WhatsApp + e-mail, crons (Cloud Run)
+packages/shared   types, schémas zod, règles de créneaux, machine à états
+infra/            Terraform GCP : Cloud Run, Secret Manager, Scheduler, Firestore, WIF GitHub
+docs/             PLAN-BACKEND-RESERVATIONS.md (architecture et phasage)
+maquette/         maquette HTML d'origine
+```
+
+Site en ligne : **https://souhailsouid.github.io/casbah/** (déployé à chaque push sur `main`).
 
 ## Démarrer
 
 ```bash
-cd casbah
-pnpm install --ignore-workspace   # projet indépendant du monorepo adel-ai
-pnpm dev                          # http://localhost:3000
-pnpm build                        # génère le site statique dans out/
+pnpm install
+pnpm build:shared            # à refaire après une modification de packages/shared
+pnpm dev:web                 # http://localhost:3000  (mode démo tant que NEXT_PUBLIC_API_URL est vide)
+pnpm dev:api                 # http://localhost:3001  (copier apps/api/.env.example → apps/api/.env)
+pnpm emulators               # Firestore + Auth locaux (nécessite Java : brew install openjdk@21)
 ```
 
-Le dossier `out/` se déploie tel quel (Vercel, Netlify, Caddy/Nginx…).
+Sans clé Resend ni WhatsApp, l'API est en **mode console** : les messages sont écrits dans le journal au lieu d'être envoyés.
 
-### Déploiement automatique (GitHub Pages)
-
-Chaque push sur `main` déclenche `.github/workflows/deploy-pages.yml` et met à jour
-**https://souhailsouid.github.io/casbah/** (build avec `BASE_PATH=/casbah`). Aucune action manuelle.
-
-### Publier en ligne (artifact Claude)
-
-Le site est publié en artifact : https://claude.ai/artifact/9UBFGJi3ohrTvMaaLCPQ82 (et l'ancien lien client https://claude.ai/artifact/F32nRqANrtLjx83EdBK62u pointe sur la même version).
-L'hébergeur refuse les chemins commençant par `_` et ne résout pas les chemins absolus, d'où un build dédié :
+### Test de bout en bout
 
 ```bash
-pnpm build:artifact   # = ASSET_PREFIX=/nx next build && node scripts/prepare-artifact.mjs
+apps/api/scripts/smoke.sh
 ```
 
-Le script réécrit les chemins en relatif et génère `out/artifact-files.json` : la carte des fichiers
-(`nx/_next/**` + `menu.jpg`) à publier avec `out/index.html`.
+Lance les émulateurs et l'API, puis déroule : disponibilités → demande → idempotence → doublon → capacité → login admin → pile → confirmation → journal des notifications → annulation par lien → crons → webhook sans signature.
 
 ## Mettre le menu à jour
 
-Tout le contenu du restaurant est dans **`data/menu.ts`** :
+Tout le contenu du restaurant est dans `apps/web/data/menu.ts` (formule, sélection d'accueil, carte complète).
+Le menu illustré est `apps/web/public/menu.jpg`. Les traductions EN/AR sont dans `apps/web/data/traductions.json`.
 
-- `FORMULE` — bandeau « Formule déjeuner » (intitulé, détail, prix, supplément)
-- `SPECIALITES_APERCU` — la sélection courte affichée sur la page d'accueil
-- `CARTE` — la carte complète (tiroir « Voir toute la carte »), section par section
+## Réservations : comment ça marche
 
-Un plat = `{ nom: "Tagine poulet", prix: 15.9, note?: "verre" }`. Le prix est un nombre (15.9 s'affiche « 15,90 € »).
+1. Le visiteur choisit rituel, espace, personnes, jour, créneau (disponibilités et affluence **réelles** via `GET /availability`), puis nom, téléphone, opt-in WhatsApp, e-mail facultatif.
+2. `POST /reservations` : validation zod, pot de miel, rate limit 5 / 10 min par IP, idempotence par UUID, anti-doublon, **transaction Firestore** sur la capacité du créneau.
+3. Notifications (`notify(event, réservation)`) : client par WhatsApp (template Meta) si opt-in, sinon e-mail ; marchand par e-mail (+ WhatsApp si configuré). Chaque envoi est journalisé (`notifications/`), relancé 3 fois en cas d'échec, mis à jour par les webhooks de livraison.
+4. Le marchand confirme ou refuse dans `/admin` (temps réel Firestore) → le client reçoit la confirmation avec lien d'annulation et `.ics`.
+5. Crons Cloud Scheduler : rappel J-1, clôture des réservations passées, relance des envois échoués.
 
-Le **menu illustré** (photo du menu imprimé) est `public/menu.jpg` : remplacer le fichier suffit.
+Détails, modèle de données et sécurité : [docs/PLAN-BACKEND-RESERVATIONS.md](docs/PLAN-BACKEND-RESERVATIONS.md).
 
-### Traductions EN / AR
+## Mise en production (une fois)
 
-Les libellés français sont traduits via `data/traductions.json` (`"texte français": ["english", "عربي"]`).
-Un nouveau plat sans entrée dans ce fichier s'affiche simplement en français dans les autres langues.
+1. **GCP** : créer le projet, activer Firebase Auth (e-mail/mot de passe) dans la console Firebase.
+2. **Terraform** : `cd infra && cp terraform.tfvars.example terraform.tfvars`, créer le bucket d'état, `terraform init && terraform apply`. Les sorties donnent l'URL de l'API, les variables GitHub et les URL de webhooks.
+3. **Secrets** : saisir les valeurs dans Secret Manager (`gcloud secrets versions add NOM --data-file=-`) : Resend, WhatsApp (token, phone number id, app secret, verify token), `CRON_SECRET`, `CANCEL_TOKEN_SECRET`.
+4. **Firestore** : `firebase deploy --only firestore:rules --project <id>` (les index sont créés par Terraform).
+5. **GitHub** : variables `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA` (déploiement API) et `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_FIREBASE_*` (site + admin). Puis relancer les deux workflows.
+6. **Compte marchand** : `pnpm -C apps/api create-admin <email> <mot-de-passe>` et `pnpm -C apps/api seed <email-notifications> [+33…]` (avec les identifiants GCP en local : `gcloud auth application-default login`).
+7. **WhatsApp** : app Meta, numéro dédié, templates `casbah_*` (voir `apps/api/src/infra/notifications/templates.ts`) soumis à approbation, webhook `…/webhooks/whatsapp` avec le verify token.
+8. **Resend** : domaine vérifié, webhook `…/webhooks/resend`.
 
-## Autres contenus
+### Publier en artifact Claude (optionnel)
 
-- `data/site.ts` — forfaits hammam, températures, avis, montants des cartes cadeaux, coordonnées
-- `components/Infos.tsx` — horaires
-- `app/globals.css` — feuille de style (identique à la maquette)
-
-## Structure
-
+```bash
+pnpm -C apps/web build:artifact   # assets en chemins relatifs sous nx/ → out/artifact-files.json
 ```
-app/            layout (polices Google), page, globals.css
-components/     Nav, Hero, Bains, Table, Offrir, Groupes, Avis, Infos, Footer,
-                tiroirs (ResaDrawer, GiftDrawer, DevisDrawer, CarteDrawer), Effects (curseur, vapeur, reveals)
-data/           menu.ts, site.ts, traductions.json
-lib/            i18n (contexte FR/EN/AR), site-context (tiroirs), format (prix)
-public/         menu.jpg
-```
-
-Les formulaires (réservation, carte cadeau, devis) sont des démos : rien n'est envoyé. Brancher Stripe / un e-mail est la prochaine étape.

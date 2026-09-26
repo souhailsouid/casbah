@@ -1,0 +1,7 @@
+project_id    = "casbah-prod"
+region        = "europe-west1"
+web_url       = "https://souhailsouid.github.io"
+web_base_path = "/casbah"
+email_from    = "La Casbah <reservations@lacasbah.fr>"
+github_repo   = "souhailsouid/casbah"
+# domain_api  = "api.lacasbah.fr"
